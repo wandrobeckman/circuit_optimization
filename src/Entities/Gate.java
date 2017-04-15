@@ -1,5 +1,7 @@
 package Entities;
 
+import circuit.entities.Input;
+
 public class Gate extends Element {
 	
 	
@@ -9,9 +11,8 @@ public class Gate extends Element {
 		String tempExpression = "~("+this.getInputName().get(0);
 		if(this.getInputName().get(0)==null)
 			tempExpression = "~("+this.getInputName().get(0);
-		boolean boolCalc = false;
-		if (result == 1)
-			boolCalc = true;
+		boolean boolCalc = result==1?true:false;
+		
 		for (int i = 1; i < this.getSize(); i++){
 			
 			if (this.getInputs().get(i) == 1)
@@ -21,8 +22,8 @@ public class Gate extends Element {
 			
 		}
 		
-		for(String expression: this.getInputName())
-			tempExpression = tempExpression + " + "+ expression;
+		for(int i=1; i<this.getInputName().size();i++)
+			tempExpression = tempExpression + " + "+ this.getInputName().get(i);
 			
 		tempExpression = tempExpression+")";
 		setComputedExpression(tempExpression);

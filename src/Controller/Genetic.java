@@ -66,9 +66,22 @@ public class Genetic {
 				System.out.print(" "+ out);
 			}
 		}
-		System.out.println("Tabela verdade");		
+		System.out.println("\nTabela verdade");		
 		System.out.println(this.population.get(0).showTruthTable());
 
+		System.out.println("Expressão ótima: "+ this.population.get(0).getOptimumExpression());
+		
+		this.population.get(0).fitness(this.truthTableInput);
+		System.out.println("\nMatriz de conexão");
+		for(int i=0; i<this.population.get(0).getnInputs()+this.population.get(0).getnGates()-1;i++){
+			System.out.println();
+			for(int j =0; j< this.population.get(0).getnGates(); j++){
+				String out = this.population.get(0).getConnectionMatrix()[i][j]!=null?this.population.get(0).getConnectionMatrix()[i][j].getConnection()+"":"X";
+				System.out.print(" "+ out);
+			}
+		}
+		System.out.println("\nTabela verdade");		
+		System.out.println(this.population.get(0).showTruthTable());
 	}
 
 	public int getNumPopulation() {
@@ -196,13 +209,13 @@ public class Genetic {
 			} while (sort1 == sort2);		
 
 			for (int j = 0; j <= pontoCorte; j++) {
-				vectAux[j] = this.population.get(sort1).getChromosome()[j];
-				vectAux2[j] = this.population.get(sort2).getChromosome()[j];
+				vectAux[j] = new Gene(this.population.get(sort1).getChromosome()[j].getConnection());
+				vectAux2[j] = new Gene(this.population.get(sort2).getChromosome()[j].getConnection());
 			}
 
 			for (int j = pontoCorte + 1; j < chromosomeSize; j++) {
-				vectAux[j] = this.population.get(sort2).getChromosome()[j];
-				vectAux2[j] = this.population.get(sort1).getChromosome()[j];
+				vectAux[j] = new Gene(this.population.get(sort2).getChromosome()[j].getConnection());
+				vectAux2[j] = new Gene(this.population.get(sort1).getChromosome()[j].getConnection());
 			}
 
 			child1.setChromosome(vectAux);
@@ -233,14 +246,16 @@ public class Genetic {
 			for (int j = 0; j < qtyGene; j++) {
 				position = new Random().nextInt(this.population.get(chosen).getChromosome().length);
 				mutationPoints = mutationPoints + " - " + position;
-				
-				this.population.get(chosen).getChromosome()[position]
-						.setConnection(Math.abs(this.population.get(chosen).getChromosome()[j].getConnection() - 1));
+				Gene vector[] =this.population.get(chosen).getChromosome();  
+				vector[position].setConnection(Math.abs(this.population.get(chosen).getChromosome()[j].getConnection() - 1));
+				this.population.get(chosen).setChromosome(vector);
 			}
 
-			
+			//this.population.get(chosen).setMatrix();
+			this.population.get(chosen).fitness(this.truthTableInput);
 
 		}
+		
 	}
 
 	public static void main(String args[]) {

@@ -55,7 +55,7 @@ public class Chromosome {
 	}
 
 	public int getFitness() {
-		return feasible?fitness:Integer.MAX_VALUE;
+		return feasible?fitness:Integer.MAX_VALUE-fitness;
 		
 	}
 	
@@ -249,8 +249,11 @@ public class Chromosome {
 		if (element.getClass().equals(Gate.class))
 			if (!element.getInputs().isEmpty())
 				element.setComputedValue(((Gate) element).computeNor());
+			else
+				return;
 
 		for (int output : element.getOutputs()){
+			
 			this.circuit[output].addInput(element.getComputedValue());
 			this.circuit[output].addInputName(element.getComputedExpression());
 		}
@@ -279,9 +282,7 @@ public class Chromosome {
 			//}
 		}
 
-		if (penality == 0) {
-			this.feasible = true;
-		}
+		this.feasible = penality==0?true:false;
 		return penality;
 	}
 
@@ -307,7 +308,8 @@ public class Chromosome {
 		for (int row = 0; row < rows; row++) {
 			for (int column = 0; column < columns; column++) {
 				if (row - this.nInputs < column) {
-					addGene(row, column, this.chromosome[index].getConnection());
+					//addGene(row, column, this.chromosome[index].getConnection());
+					this.connectionMatrix[row][column].setConnection(this.chromosome[index].getConnection());
 					index++;
 				}
 			}
@@ -316,36 +318,60 @@ public class Chromosome {
 
 	public static void main(String[] args) {
 
-		/*
-		 * Chromosome teste = new Chromosome(2);
-		 * 
-		 * teste.addGene(0, 0, 1); teste.addGene(0, 1, 1); teste.addGene(0, 2,
-		 * 0); teste.addGene(0, 3, 0); teste.addGene(0, 4, 0);
-		 * 
-		 * teste.addGene(1, 0, 1); teste.addGene(1, 1, 0); teste.addGene(1, 2,
-		 * 1); teste.addGene(1, 3, 0); teste.addGene(1, 4, 0);
-		 * 
-		 * teste.addGene(2, 1, 1); teste.addGene(2, 2, 1); teste.addGene(2, 3,
-		 * 1); teste.addGene(2, 4, 1);
-		 * 
-		 * teste.addGene(3, 2, 0); teste.addGene(3, 3, 1); teste.addGene(3, 4,
-		 * 0);
-		 * 
-		 * teste.addGene(4, 3, 0); teste.addGene(4, 4, 1);
-		 * 
-		 * teste.addGene(5, 4, 0);
-		 * 
-		 * int truthTable[][] = { {0,0,1}, {0,1,1}, {1,0,1}, {1,1,1} };
-		 * teste.fitness(truthTable);
-		 * System.out.println(teste.showTruthTable());
-		 * System.out.println(teste.numCells()); System.out.println("Fitness: "+
-		 * teste.getFitness());
-		 * 
-		 */
+		int truthTable[][] = { 	{ 0, 0, 1 }, 
+								{ 0, 1, 0 }, 
+								{ 1, 0, 0 }, 
+								{ 1, 1, 1 } };
+        List<Input> inputs = new ArrayList<>();
+        inputs.add(new Input("a"));
+        inputs.add(new Input("b"));
+		  Chromosome teste = new Chromosome(inputs);
 
-		Random gerador = new Random();
-		int numero = gerador.nextInt((10 - 2) + 1) + 2;
-		System.out.println(numero);
+		  
+		  teste.addGene(0, 0, 0);
+		  teste.addGene(0, 1, 0);
+		  teste.addGene(0, 2, 0); 
+		  teste.addGene(0, 3, 1);
+		  teste.addGene(0, 4, 0);
+		  
+		  teste.addGene(1, 0, 0);
+		  teste.addGene(1, 1, 0);
+		  teste.addGene(1, 2, 0);
+		  teste.addGene(1, 3, 0);
+		  teste.addGene(1, 4, 0);
+		  
+		  teste.addGene(2, 1, 0);
+		  teste.addGene(2, 2, 0);
+		  teste.addGene(2, 3, 1);
+		  teste.addGene(2, 4, 1);
+		  
+		  teste.addGene(3, 2, 1);
+		  teste.addGene(3, 3, 0); 
+		  teste.addGene(3, 4, 0);
+		  
+		  teste.addGene(4, 3, 1); 
+		  teste.addGene(4, 4, 0);
+		  
+		  teste.addGene(5, 4, 0);
+		  
+		  for(int i=0; i<teste.getnInputs()+teste.getnGates()-1;i++){
+				System.out.println();
+				for(int j =0; j< teste.getnGates(); j++){
+					String out = teste.getConnectionMatrix()[i][j]!=null?teste.getConnectionMatrix()[i][j].getConnection()+"":"X";
+					System.out.print(" "+ out);
+				}
+			}
+		  
+		  
+		  teste.fitness(truthTable);
+		  System.out.println(teste.showTruthTable());
+		  
+		  System.out.println("Fitness: "+
+		  teste.getFitness());
+		  System.out.println(teste.getOptimumExpression());
+		  
+		 
+
 
 	}
 
