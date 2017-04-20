@@ -9,7 +9,7 @@ public class Element {
 	private List<Integer> outputs;
 	private List<String> inputName;
 	private int computedValue = -1;
-	private int size =0;
+	private int size = 0;
 	private String computedExpression;
 
 	public String getComputedExpression() {
@@ -32,6 +32,7 @@ public class Element {
 		inputs.add(input);
 		size++;
 	}
+
 	public void addInputName(String inputName) {
 		this.inputName.add(inputName);
 	}
@@ -39,7 +40,7 @@ public class Element {
 	public void addOutput(int output) {
 		this.outputs.add(output);
 	}
-	
+
 	public int getSize() {
 		return size;
 	}

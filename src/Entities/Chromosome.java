@@ -292,7 +292,7 @@ public class Chromosome {
 		return penality;
 	}
 
-	// *retorna numero de celulas do cromossomo
+	
 	public int numCells() {
 		int ng, rectangle, triangle, numCells;
 		ng = nGates;
@@ -303,7 +303,7 @@ public class Chromosome {
 		return numCells;
 	}
 
-	// metodo para redefinicao da matriz
+	
 	public void setMatrix() {
 
 		int rows = this.nInputs * this.nInputs;
