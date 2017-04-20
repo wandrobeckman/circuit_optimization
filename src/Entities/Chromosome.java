@@ -15,6 +15,7 @@ public class Chromosome {
 	private int nInputs;
 	private int nGates;
 	private int fitness;
+	private int maxPenalty;
 	private boolean feasible;
 	private List<Input> inputs;
 	private String optimumExpression;
@@ -26,6 +27,7 @@ public class Chromosome {
 		this.nGates = (nInputs * nInputs) + 1;
 		this.chromosome = new Gene[numCells()];
 		this.connectionMatrix = new Gene[(nInputs * nInputs) + nInputs][nGates];
+		this.maxPenalty = (numCells()+nGates)+(numCells()+nGates)*((int) Math.pow(2, nInputs));
 		randomInitialize();
 		truthTableChrom();
 		this.feasible = false;
@@ -55,8 +57,12 @@ public class Chromosome {
 	}
 
 	public int getFitness() {
-		return feasible?fitness:Integer.MAX_VALUE-fitness;
-		
+		if(feasible){
+			return getPenalty();
+		}else{
+			return this.maxPenalty + getPenalty();
+		}
+		//return feasible?fitness:Integer.MAX_VALUE-fitness;		
 	}
 	
 	public int getPenalty(){

@@ -32,8 +32,7 @@ public class MiddleCodeReader {
         String json = "";
         
         try {
-            Scanner reader = new Scanner(new FileReader(file));
-            
+            Scanner reader = new Scanner(new FileReader(file));            
             
             while(reader.hasNext()){
                 String line = reader.nextLine();
@@ -49,19 +48,19 @@ public class MiddleCodeReader {
     
     public static void main(String args[]){
         JFileChooser file = new JFileChooser();
-       // file.showOpenDialog(null);
-        //File selectedFile = file.getSelectedFile();
-        int truthTable[][] = { { 0, 0, 1 }, { 0, 1, 0 }, { 1, 0, 0 }, { 1, 1, 1 } };
-        List<Input> inputs = new ArrayList<>();
-        inputs.add(new Input("a"));
-        inputs.add(new Input("b"));
+        file.showOpenDialog(null);
+        File selectedFile = file.getSelectedFile();
+       // int truthTable[][] = { { 0, 0, 1 }, { 0, 1, 0 }, { 1, 0, 0 }, { 1, 1, 1 } };
+        //List<Input> inputs = new ArrayList<>();
+        //inputs.add(new Input("a"));
+        //inputs.add(new Input("b"));
         
         
-        //String json = MiddleCodeReader.readJSON(selectedFile);
-        //Gson gson = new Gson();
-        //CircuitModel circuit = gson.fromJson(json, CircuitModel.class);
+        String json = MiddleCodeReader.readJSON(selectedFile);
+        Gson gson = new Gson();
+        CircuitModel circuit = gson.fromJson(json, CircuitModel.class);
         
-       // int truthTable[][] = TruthTableCreator.truthTable(circuit.getOutputs().get(0), circuit.getInputs());
+        int truthTable[][] = TruthTableCreator.truthTable(circuit.getOutputs().get(0), circuit.getInputs());
         /*
         for(int row = 0; row< truthTable.length;row++){
         	System.out.println();
@@ -70,7 +69,8 @@ public class MiddleCodeReader {
         	}
         }*/
         
-        Genetic genetic = new Genetic(1000, truthTable, 30, 10, 50, 500, inputs);
+       Genetic genetic = new Genetic(30, truthTable, 20, 1, 80, circuit.getInputs());
+       //Genetic genetic = new Genetic(5000, truthTable, 5, 1, 80, 20,circuit.getInputs());
         
     }
 }
