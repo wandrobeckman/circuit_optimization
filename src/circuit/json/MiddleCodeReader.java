@@ -49,8 +49,10 @@ public class MiddleCodeReader {
 
 	public static void main(String args[]) {
 		JFileChooser file = new JFileChooser();
-		file.showOpenDialog(null);
-		File selectedFile = file.getSelectedFile();
+		//file.showOpenDialog(null);
+		
+		File selectedFile = new File("/home/pedro/Documents/circuito_5.mdl");
+		System.out.println(selectedFile.getPath());
 		//File selectedFile = "/root/maioria.mdl";
 		// int truthTable[][] = { { 0, 0, 1 }, { 0, 1, 0 }, { 1, 0, 0 }, { 1, 1,
 		// 1 } };
@@ -68,8 +70,9 @@ public class MiddleCodeReader {
 		 * for(int column = 0; column<truthTable[0].length;column++){
 		 * System.out.print(" "+ truthTable[row][column]); } }
 		 */
+		System.out.println("truthtble pronta");
 
-		Genetic genetic = new Genetic(250, truthTable, 50, 1, 50, circuit.getInputs());
+		Genetic genetic = new Genetic(250	, truthTable, 50, 5, 50, circuit.getInputs());
 		//Genetic genetic = new Genetic(5000, truthTable, 5, 1, 80, 20,circuit.getInputs());
 
 	}

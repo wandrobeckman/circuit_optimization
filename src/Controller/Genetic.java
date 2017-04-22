@@ -35,7 +35,7 @@ public class Genetic {
 
 		for (int generation = 0; generation < numGenerations; generation++) {
 
-			mutation();
+		
 
 			crossover();
 
@@ -88,10 +88,28 @@ public class Genetic {
 		int generation = 0;
 		int stopCondition = 10;
 		boolean end = false;
+		int gera = 0;
+		while(!this.population.get(numPopulation-1).isFeasible()){
+			crossover();
+			sortBestChromosome();
+			gera++;
+			/*			for (int i = numPopulation - 1; i > -1; i--) {
+				System.out.println("Chromossome[" + i + "]: " + this.population.get(i).getPenalty() + " Factivel: "
+						+ this.population.get(i).isFeasible() + " Fitness " + this.population.get(i).getFitness());
+			}*/
+						
+						System.out.println("Evoluindo... ["+ gera+"]");
+						System.out.println();
+						System.out.println("Melhor dessa rodada: "+ this.population.get(0).getFitness() +" factível "+ this.population.get(0).isFeasible());
+						System.out.println();
+						System.out.println("Pior dessa rodada "+ this.population.get(numPopulation-1).getFitness() +" factível "+ this.population.get(numPopulation-1).isFeasible());
+
+			
+		}
 		for (generation = 0; //this.population.get(0).getFitness()>50 || 
 				!end; generation++, stopCondition--) {
 
-			mutation();
+			
 
 			crossover();
 
@@ -102,12 +120,14 @@ public class Genetic {
 
 			if (this.population.get(0).getFitness() < survivor.getFitness()) {
 				survivor = this.population.get(0);
+				
 				stopCondition = 10;
+				
 
 			}
 
 			end = stopCondition == 0;
-
+			
 		}
 
 		// System.out.println();
@@ -121,14 +141,7 @@ public class Genetic {
 		System.out.println("Expressão ótima: " + this.survivor.getOptimumExpression());
 		System.out.println();
 		System.out.println("Matriz de conexão");
-		for (int i = 0; i < this.survivor.getnInputs() + survivor.getnGates() - 1; i++) {
-			System.out.println();
-			for (int j = 0; j < this.survivor.getnGates(); j++) {
-				String out = this.survivor.getConnectionMatrix()[i][j] != null
-						? this.survivor.getConnectionMatrix()[i][j].getConnection() + "" : "X";
-				System.out.print(" " + out);
-			}
-		}
+		survivor.printConnectionMatrix();
 		System.out.println();
 		System.out.println("\nTabela verdade");
 		System.out.println(this.survivor.showTruthTable());
@@ -213,6 +226,20 @@ public class Genetic {
 		});
 
 	}
+	
+	private void sorting(List<Chromosome> list){
+		for(int i=0;i<population.size();i++){
+			for(int j=0; j<population.size()-1;j++){
+				if(population.get(j).getFitness()>population.get(j+1).getFitness()){
+					Chromosome temp = population.get(j);
+					population.set(j, population.get(j+1));
+					population.set(j+1, temp);
+				}
+			}
+		}
+	}
+	
+	
 
 	public void crossover() {
 
@@ -220,12 +247,12 @@ public class Genetic {
 		int qtyCrossover = Math.round(this.numPopulation * this.percentCrossover / 100);
 		int chromosomeSize = this.population.get(0).numCells();
 		int sort1, sort2;
-		int pontoCorte = new Random().nextInt(chromosomeSize - 2) + 1;
+		
+		
 		// System.out.println("Ponto de corte:" + pontoCorte);
-		Chromosome child1 = new Chromosome(this.inputs);
-		Chromosome child2 = new Chromosome(this.inputs);
-		Gene[] vectAux = new Gene[child1.numCells()];
-		Gene[] vectAux2 = new Gene[child2.numCells()];
+		
+		//Chromosome child2 = new Chromosome(this.inputs);
+		
 		int worstParentAddrs = -1;
 		int worstParentCost = -1;
 		
@@ -234,13 +261,16 @@ public class Genetic {
 			// System.out.println("Cruzamento com " + qtyCrossover + "
 			// indivíduos.");
 		}
+		
+		
+		for (int i = 0; i < qtyCrossover; i++) {
+			Chromosome child1 = new Chromosome(this.inputs);
+			int pontoCorte = new Random().nextInt(chromosomeSize - 2) + 1;
 
-		for (int i = 0; i < qtyCrossover / 2; i++) {
-
-			//do {
-				sort1 = this.numPopulation-(i+1);//new Random().nextInt(this.numPopulation);
-				sort2 = this.numPopulation-(i+2);//new Random().nextInt(this.numPopulation);
-			//} while (sort1 == sort2);
+			do {
+				sort1 = new Random().nextInt(this.numPopulation);
+				sort2 = new Random().nextInt(this.numPopulation);
+			} while (sort1 == sort2);
 			if(this.population.get(sort1).getFitness()> this.population.get(sort2).getFitness()){
 				worstParentAddrs = sort1;
 				worstParentCost = this.population.get(sort1).getFitness();
@@ -249,58 +279,74 @@ public class Genetic {
 				worstParentCost = this.population.get(sort2).getFitness();
 			}
 			for (int j = 0; j <= pontoCorte; j++) {
-				vectAux[j] = new Gene(this.population.get(sort1).getChromosome()[j].getConnection());
-				vectAux2[j] = new Gene(this.population.get(sort2).getChromosome()[j].getConnection());
+				int replacement = this.population.get(sort1).getChromosome()[j].getConnection()==0?0:1;
+				
+				child1.setChromosomeCell(j, replacement);
+				//vectAux2[j] = new Gene(this.population.get(sort2).getChromosome()[j].getConnection());
 			}
 
 			for (int j = pontoCorte + 1; j < chromosomeSize; j++) {
-				vectAux[j] = new Gene(this.population.get(sort2).getChromosome()[j].getConnection());
-				vectAux2[j] = new Gene(this.population.get(sort1).getChromosome()[j].getConnection());
+				int replacement = this.population.get(sort2).getChromosome()[j].getConnection()==0?0:1;
+				child1.setChromosomeCell(j, replacement);
+				//vectAux2[j] = new Gene(this.population.get(sort1).getChromosome()[j].getConnection());
 			}
 			
-			child1.setChromosome(vectAux);
+			/*System.out.println();
+			System.out.println("Depois do cruzamento");
+			System.out.println();
+			child1.printConnectionMatrix();
+			System.out.println();
+			System.out.println("Vetor de conexões");
+			System.out.println();
+			child1.printConnectionVector();*/
+			
+			//child1.setChromosome(vectAux);
+			mutation(child1);
+			//System.out.println();
+			//child1.printConnectionVector();
 			//child2.setChromosome(vectAux2);
-			child1.setMatrix();
+			//child1.setMatrix();
 			//child2.setMatrix();
 			child1.fitness(this.truthTableInput);
 			//child2.fitness(this.truthTableInput);
-			
-			if(child1.getFitness()<this.population.get(worstParentAddrs).getFitness())
+			int childFitness = child1.getFitness();
+			if(childFitness<worstParentCost)
 				this.population.set(worstParentAddrs, child1);
 
 		}
 		
 	}
-
-	public void mutation() {
+	public void mutation(Chromosome chromosome) {
 
 		int qtyMutation = Math.round((this.numPopulation * this.percentMutation) / 100);
 		int qtyGene = (int) Math.ceil((this.population.get(0).numCells() * this.percentMutGene) / 100.00);
 		int position = 0;
-		int chosen;
+		//int chosen;
 		String mutationPoints = "";
 
-		for (int i = 0; i < qtyMutation; i++) {
+		//for (int i = 0; i < qtyMutation; i++) {
 
 			
-			chosen = new Random().nextInt(this.numPopulation-1)+1;
+			//chosen = new Random().nextInt(this.numPopulation-1)+1;
 			
 
 			for (int j = 0; j < qtyGene; j++) {
-				position = new Random().nextInt(this.population.get(chosen).getChromosome().length);
+				position = new Random().nextInt(chromosome.getChromosome().length);
 				mutationPoints = mutationPoints + " - " + position;
-				Gene vector[] = this.population.get(chosen).getChromosome();
-				vector[position]
-						.setConnection(Math.abs(this.population.get(chosen).getChromosome()[j].getConnection() - 1));
-				this.population.get(chosen).setChromosome(vector);
+				//System.out.println("Antes da mutação: valor["+chromosome.getChromosome()[position].getConnection()+"]");
+				chromosome.setChromosomeCell(position, Math.abs(chromosome.getChromosome()[position].getConnection() - 1));
+				//System.out.println("Após a mutação: valor["+chromosome.getChromosome()[position].getConnection()+"]");
+				
 			}
 
 			// this.population.get(chosen).setMatrix();
-			this.population.get(chosen).fitness(this.truthTableInput);
+			//this.population.get(chosen).fitness(this.truthTableInput);
 
-		}
+		//}
 
 	}
+	
+
 
 	public static void main(String args[]) {
 

@@ -37,7 +37,10 @@ public class Chromosome {
 	public String getOptimumExpression() {
 		return optimumExpression;
 	}
-
+	
+	public int getMaxPenalty(){
+		return this.maxPenalty;
+	}
 
 	public void setOptimumExpression(String optimumExpression) {
 		this.optimumExpression = optimumExpression;
@@ -58,9 +61,9 @@ public class Chromosome {
 
 	public int getFitness() {
 		if(feasible){
-			return getPenalty();
+			return fitness;
 		}else{
-			return this.maxPenalty + getPenalty();
+			return this.maxPenalty + fitness;
 		}
 		//return feasible?fitness:Integer.MAX_VALUE-fitness;		
 	}
@@ -133,6 +136,10 @@ public class Chromosome {
 				}
 			}
 		}
+	}
+	
+	public void setChromosomeCell(int index,int newGene){
+		this.chromosome[index].setConnection(newGene);
 	}
 
 	public void truthTableChrom() {
@@ -270,6 +277,23 @@ public class Chromosome {
 		element.getInputName().clear();
 
 	}
+	
+	public void printConnectionVector(){
+		for(int i=0; i<this.chromosome.length;i++){
+			System.out.print(" "+ this.chromosome[i].getConnection());
+		}
+	}
+	
+	public void printConnectionMatrix(){
+		for (int i = 0; i < this.getnInputs() + this.getnGates() - 1; i++) {
+			System.out.println();
+			for (int j = 0; j < this.getnGates(); j++) {
+				String out = this.getConnectionMatrix()[i][j] != null
+						? this.getConnectionMatrix()[i][j].getConnection() + "" : "X";
+				System.out.print(" " + out);
+			}
+		}
+	}
 
 	// *
 	public int feasible(int truthTableIn[][]) {
@@ -288,7 +312,7 @@ public class Chromosome {
 			//}
 		}
 
-		this.feasible = penality==0?true:false;
+		this.feasible = penality==0;
 		return penality;
 	}
 
