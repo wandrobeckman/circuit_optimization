@@ -15,6 +15,8 @@ import circuit.entities.Input;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.FilterWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,32 +51,41 @@ public class MiddleCodeReader {
 
 	public static void main(String args[]) {
 		JFileChooser file = new JFileChooser();
-		//file.showOpenDialog(null);
+		file.showOpenDialog(null);
 		
-		File selectedFile = new File("/home/beckman/Documentos/maioria.mdl");
-		System.out.println(selectedFile.getPath());
-		//File selectedFile = "/root/maioria.mdl";
-		// int truthTable[][] = { { 0, 0, 1 }, { 0, 1, 0 }, { 1, 0, 0 }, { 1, 1,
-		// 1 } };
-		// List<Input> inputs = new ArrayList<>();
-		// inputs.add(new Input("a"));
-		// inputs.add(new Input("b"));
-
-		String json = MiddleCodeReader.readJSON(selectedFile);
-		Gson gson = new Gson();
-		CircuitModel circuit = gson.fromJson(json, CircuitModel.class);
-
-		int truthTable[][] = TruthTableCreator.truthTable(circuit.getOutputs().get(0), circuit.getInputs());
-		/*
-		 * for(int row = 0; row< truthTable.length;row++){ System.out.println();
-		 * for(int column = 0; column<truthTable[0].length;column++){
-		 * System.out.print(" "+ truthTable[row][column]); } }
-		 */
-		System.out.println("truthtble pronta");
-		
-		//Genetic genetic = new Genetic(250	, truthTable, 50, 5, 50, circuit.getInputs());
-		Genetic genetic = new Genetic(20,truthTable, 1, 1, 10, circuit.getInputs());
-		//Genetic genetic = new Genetic(5000, truthTable, 5, 1, 80, 20,circuit.getInputs());
+		File selectedFile = file.getSelectedFile();
+		if(selectedFile!=null){
+			CircuitModel circuitOut = new CircuitModel();
+			String json = MiddleCodeReader.readJSON(selectedFile);
+			Gson gson = new Gson();
+			CircuitModel circuit = gson.fromJson(json, CircuitModel.class);
+			circuitOut.setInputs(circuit.getInputs());
+			
+			for(int i =0; i< circuit.getOutputs().size();i++){
+				int truthTable[][] = TruthTableCreator.truthTable(circuit.getOutputs().get(i), circuit.getInputs());
+				Genetic genetic = new Genetic(250,truthTable, 1, 10, 50, circuit.getInputs());
+				//circuitOut.addOutput(circuit.getOutputs().get(i).getName(), circuit.getOutputs().get(i).getExpression(), genetic.getSurvivor().getOptimumExpression());
+				String name = circuit.getOutputs().get(i).getName()+".m";
+				JFileChooser directoryChooser = new JFileChooser();
+				directoryChooser.setDialogTitle("Salvar arquivo m");
+				directoryChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				directoryChooser.showSaveDialog(null);
+				File mFile = new File(directoryChooser.getSelectedFile()+File.separator+name);
+				System.out.println(mFile.getAbsolutePath());
+				try {
+					FileWriter fw = new FileWriter(mFile);
+					fw.write(genetic.getOutput());
+					fw.flush();
+					fw.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			
+			
+		}
 		
 		
 	}

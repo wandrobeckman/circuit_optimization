@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
 import circuit.entities.Input;
 
 public class Chromosome {
@@ -19,7 +23,7 @@ public class Chromosome {
 	private boolean feasible;
 	private List<Input> inputs;
 	private String optimumExpression;
-	
+   
 
 	public Chromosome(List<Input> inputs) {
 		this.nInputs = inputs.size();
@@ -27,25 +31,28 @@ public class Chromosome {
 		this.nGates = (nInputs * nInputs) + 1;
 		this.chromosome = new Gene[numCells()];
 		this.connectionMatrix = new Gene[(nInputs * nInputs) + nInputs][nGates];
-		this.maxPenalty = (numCells()+nGates)+(numCells()+nGates)*((int) Math.pow(2, nInputs));
+		this.maxPenalty = (numCells() + nGates) + (numCells() + nGates) * ((int) Math.pow(2, nInputs));
 		randomInitialize();
 		truthTableChrom();
 		this.feasible = false;
+		circuit = new Element[nGates + nInputs];
+		for(int i=0; i< nInputs;i++)
+			circuit[i] = new Element();
+		for(int i= nInputs; i<nGates+nInputs;i++)
+			circuit[i] = new Gate();
 	}
-	
 
 	public String getOptimumExpression() {
 		return optimumExpression;
 	}
-	
-	public int getMaxPenalty(){
+
+	public int getMaxPenalty() {
 		return this.maxPenalty;
 	}
 
 	public void setOptimumExpression(String optimumExpression) {
 		this.optimumExpression = optimumExpression;
 	}
-
 
 	public Gene[][] getConnectionMatrix() {
 		return connectionMatrix;
@@ -60,24 +67,22 @@ public class Chromosome {
 	}
 
 	public int getFitness() {
-		if(feasible){
+		if (feasible) {
 			return fitness;
-		}else{
+		} else {
 			return this.maxPenalty + fitness;
 		}
-		//return feasible?fitness:Integer.MAX_VALUE-fitness;		
 	}
-	
-	public int getPenalty(){
+
+	public int getPenalty() {
 		return this.fitness;
 	}
 
-	// *
 	public int[][] getTruthTableChrom() {
 		return truthTableChrom;
 	}
 
-	// *
+
 	public void setTruthTableChrom(int[][] truthTableChrom) {
 		this.truthTableChrom = truthTableChrom;
 	}
@@ -90,7 +95,7 @@ public class Chromosome {
 		this.chromosome = chromosome;
 	}
 
-	// *
+	
 	public void setFitness(int fitness) {
 		this.fitness = fitness;
 	}
@@ -137,8 +142,8 @@ public class Chromosome {
 			}
 		}
 	}
-	
-	public void setChromosomeCell(int index,int newGene){
+
+	public void setChromosomeCell(int index, int newGene) {
 		this.chromosome[index].setConnection(newGene);
 	}
 
@@ -148,11 +153,11 @@ public class Chromosome {
 		this.truthTableChrom = new int[tableSize][this.nInputs + 1];
 
 		for (int column = 0; column < this.nInputs; column++) {
-			//System.out.println();
+			
 
 			int repeat = this.nInputs - column;
 			int pattern = 0;
-			
+
 			repeat = (int) Math.pow(2, repeat) / 2;
 			int cont = repeat;
 
@@ -186,23 +191,22 @@ public class Chromosome {
 		int linhas = connectionMatrix.length;
 		int colunas = connectionMatrix[0].length;
 
-		circuit = new Element[linhas + 1];
-		circuit[linhas] = new Gate();
+		for(int i=0; i< nInputs+nGates;i++){
+			circuit[i].setComputedValue(-1);
+			circuit[i].getOutputs().clear();
+		}
+		
 		int gates[] = new int[this.nGates];
 		int index = 0;
 		for (int coluna = 0; coluna < colunas; coluna++) {
 			for (int linha = 0; linha < linhas; linha++) {
 				if (connectionMatrix[linha][coluna] != null) {
-					if (circuit[linha] == null) {
-						if (linha < this.nInputs){
-							
-							circuit[linha] = new Element();
+					if (circuit[linha].getComputedExpression() == null) {
+						if (linha < this.nInputs) {
+
 							circuit[linha].setComputedExpression(this.inputs.get(index).getName());
 							index++;
 						}
-							
-						else
-							circuit[linha] = new Gate();
 
 					}
 					if (connectionMatrix[linha][coluna].getConnection() != 0) {
@@ -230,11 +234,9 @@ public class Chromosome {
 		for (int i = 0; i < rows; i++) {
 			List<Integer> inputList = new ArrayList<>();
 			for (int j = 0; j < this.nInputs; j++) {
-				//System.out.print("entrada: " + this.truthTableChrom[i][j] + " - ");
 				inputList.add(this.truthTableChrom[i][j]);
 			}
 			this.truthTableChrom[i][wishedOutput] = computeData(inputList);
-			//System.out.println("SAIDA: " + this.truthTableChrom[i][wishedOutput] + " ");
 		}
 	}
 
@@ -265,26 +267,25 @@ public class Chromosome {
 			else
 				return;
 
-		for (int output : element.getOutputs()){
-			
+		for (int output : element.getOutputs()) {
+
 			this.circuit[output].addInput(element.getComputedValue());
 			this.circuit[output].addInputName(element.getComputedExpression());
 		}
-			
-		// element.getOutputs().clear();
+
 		element.getInputs().clear();
 		element.setSize(0);
 		element.getInputName().clear();
 
 	}
-	
-	public void printConnectionVector(){
-		for(int i=0; i<this.chromosome.length;i++){
-			System.out.print(" "+ this.chromosome[i].getConnection());
+
+	public void printConnectionVector() {
+		for (int i = 0; i < this.chromosome.length; i++) {
+			System.out.print(" " + this.chromosome[i].getConnection());
 		}
 	}
-	
-	public void printConnectionMatrix(){
+
+	public void printConnectionMatrix() {
 		for (int i = 0; i < this.getnInputs() + this.getnGates() - 1; i++) {
 			System.out.println();
 			for (int j = 0; j < this.getnGates(); j++) {
@@ -303,20 +304,15 @@ public class Chromosome {
 		int columns = this.nInputs;
 
 		for (int row = 0; row < rows; row++) {
-			//for (int column = 0; column < columns; column++) {
-				//if (column == columns - 1) {
-					if (truthTableIn[row][columns] != this.truthTableChrom[row][columns]) {
-						penality++;
-					}
-				//}
-			//}
+			if (truthTableIn[row][columns] != this.truthTableChrom[row][columns]) {
+				penality++;
+			}
 		}
 
-		this.feasible = penality==0;
+		this.feasible = penality == 0;
 		return penality;
 	}
 
-	
 	public int numCells() {
 		int ng, rectangle, triangle, numCells;
 		ng = nGates;
@@ -327,82 +323,5 @@ public class Chromosome {
 		return numCells;
 	}
 
-	
-	public void setMatrix() {
-
-		int rows = this.nInputs * this.nInputs;
-		rows += this.nInputs;
-		int columns = nGates;
-		int index = 0;
-
-		for (int row = 0; row < rows; row++) {
-			for (int column = 0; column < columns; column++) {
-				if (row - this.nInputs < column) {
-					//addGene(row, column, this.chromosome[index].getConnection());
-					this.connectionMatrix[row][column].setConnection(this.chromosome[index].getConnection());
-					index++;
-				}
-			}
-		}
-	}
-
-	public static void main(String[] args) {
-
-		int truthTable[][] = { 	{ 0, 0, 1 }, 
-								{ 0, 1, 0 }, 
-								{ 1, 0, 0 }, 
-								{ 1, 1, 1 } };
-        List<Input> inputs = new ArrayList<>();
-        inputs.add(new Input("a"));
-        inputs.add(new Input("b"));
-		  Chromosome teste = new Chromosome(inputs);
-
-		  
-		  teste.addGene(0, 0, 0);
-		  teste.addGene(0, 1, 0);
-		  teste.addGene(0, 2, 0); 
-		  teste.addGene(0, 3, 1);
-		  teste.addGene(0, 4, 0);
-		  
-		  teste.addGene(1, 0, 0);
-		  teste.addGene(1, 1, 0);
-		  teste.addGene(1, 2, 0);
-		  teste.addGene(1, 3, 0);
-		  teste.addGene(1, 4, 0);
-		  
-		  teste.addGene(2, 1, 0);
-		  teste.addGene(2, 2, 0);
-		  teste.addGene(2, 3, 1);
-		  teste.addGene(2, 4, 1);
-		  
-		  teste.addGene(3, 2, 1);
-		  teste.addGene(3, 3, 0); 
-		  teste.addGene(3, 4, 0);
-		  
-		  teste.addGene(4, 3, 1); 
-		  teste.addGene(4, 4, 0);
-		  
-		  teste.addGene(5, 4, 0);
-		  
-		  for(int i=0; i<teste.getnInputs()+teste.getnGates()-1;i++){
-				System.out.println();
-				for(int j =0; j< teste.getnGates(); j++){
-					String out = teste.getConnectionMatrix()[i][j]!=null?teste.getConnectionMatrix()[i][j].getConnection()+"":"X";
-					System.out.print(" "+ out);
-				}
-			}
-		  
-		  
-		  teste.fitness(truthTable);
-		  System.out.println(teste.showTruthTable());
-		  
-		  System.out.println("Fitness: "+
-		  teste.getFitness());
-		  System.out.println(teste.getOptimumExpression());
-		  
-		 
-
-
-	}
 
 }
