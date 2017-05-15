@@ -25,10 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 
-/**
- *
- * @author pedro
- */
+
 public class MiddleCodeReader {
 
 	public static String readJSON(File file) {
@@ -63,7 +60,8 @@ public class MiddleCodeReader {
 			
 			for(int i =0; i< circuit.getOutputs().size();i++){
 				int truthTable[][] = TruthTableCreator.truthTable(circuit.getOutputs().get(i), circuit.getInputs());
-				Genetic genetic = new Genetic(250,truthTable, 1, 10, 50, circuit.getInputs());
+				Genetic genetic = new Genetic(2000,truthTable, 10, 10, 50, circuit.getInputs());
+				//Genetic genetic = new Genetic(2000,truthTable, 10, 10, 50, 100, circuit.getInputs());
 				//circuitOut.addOutput(circuit.getOutputs().get(i).getName(), circuit.getOutputs().get(i).getExpression(), genetic.getSurvivor().getOptimumExpression());
 				String name = circuit.getOutputs().get(i).getName()+".m";
 				JFileChooser directoryChooser = new JFileChooser();

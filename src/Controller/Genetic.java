@@ -74,7 +74,8 @@ public class Genetic {
 		System.out.println("\nTabela verdade");
 		System.out.println(this.population.get(0).showTruthTable());
 	}
-
+	
+	
 	public Genetic(int numPopulation, int target[][], int mutationPercentual, int mutGenePercentual,
 			int crossoverPercentual, List<Input> inputs) {
 		this.inputs = inputs;
@@ -111,10 +112,10 @@ public class Genetic {
 			crossover();
 			sortBestChromosome();			
 
-			if (this.population.get(0).getFitness() < survivor.getFitness()) {
-				survivor = this.population.get(0);
+			//if (this.population.get(0).getFitness() < survivor.getFitness()) {
+				
 
-			}
+			//}
 			System.out.println("Evoluindo... ["+ gera+"]");
 			System.out.println();
 			System.out.println("Melhor dessa rodada: "+ this.population.get(0).getFitness() +" factível "+ this.population.get(0).isFeasible());
@@ -124,6 +125,7 @@ public class Genetic {
 			output = output+this.population.get(0).getFitness()+","+this.population.get(numPopulation-1).getFitness() +";\n";
 			
 		}
+		survivor = this.population.get(0);
 		output+= "]";
 		for (int i = numPopulation - 1; i > -1; i--) {
 			System.out.println("Chromossome[" + i + "]: " + this.population.get(i).getPenalty() + " Factivel: "
@@ -140,7 +142,9 @@ public class Genetic {
 		System.out.println(this.survivor.showTruthTable());
 		System.out.println("\nGerações: " + gera);
 		System.out.println("Fitness do cromossomo: " + this.survivor.getFitness());
+		System.out.println("Pior Fitness da rodada: " + this.population.get(numPopulation-1).getFitness());
 	}
+	
 	
 	public String getOutput(){
 		return this.output;
